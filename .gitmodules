@@ -1,0 +1,3 @@
+[submodule "ptcan"]
+	path = ptcan
+	url = http://172.16.13.152/ktc256v2/ptcan.git
