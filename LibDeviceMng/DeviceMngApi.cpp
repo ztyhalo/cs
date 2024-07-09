@@ -57,10 +57,10 @@ int DeviceMngApi::init_data(uint32_t waittime_ms, uint8_t select)
     gettimeofday(&start, NULL);
     ret = pDeviceMng->Init(waittime_ms);
     gettimeofday(&end, NULL);
-    suseconds_t msec = end.tv_usec - start.tv_usec;
-    time_t      sec  = end.tv_sec - start.tv_sec;
-    char buff[512] = {0};
-    sprintf(buff,"LibDeviceMng time used:%u.%us",sec, msec);
+    suseconds_t msec      = end.tv_usec - start.tv_usec;
+    time_t      sec       = end.tv_sec - start.tv_sec;
+    char        buff[512] = {0};
+    sprintf(buff, "LibDeviceMng time used:%u.%us", sec, msec);
     sysLogQD() << buff;
 
     if (select == 0)
@@ -296,7 +296,7 @@ bool DeviceMngApi::wait_msg(sMsgUnit* recvmsg, uint16_t* msglen, eWaitMsgType mo
 
     if (ret < 0)
     {
-        sysLogQD()<<"LibDeviceMng sem_trywait  ret <0";
+        sysLogQD() << "LibDeviceMng sem_trywait  ret <0";
         return false;
     }
 
@@ -320,16 +320,15 @@ bool DeviceMngApi::read_state(uint8_t DriverId, int childid, char* value, uint16
     driver* pdriver;
     bool    ret;
 
-    //DriverId大于10表示是中继的，对于中继的共享内存统一在主控cs1共享内存下延伸。
-    if(DriverId > 10)
+    // DriverId大于10表示是中继的，对于中继的共享内存统一在主控cs1共享内存下延伸。
+    if (DriverId > 10)
     {
         DriverId = 1;
     }
 
-
     if (!pDeviceMng->FindDriver(DriverId, &pdriver))
     {
-        sysLogQE() << "LibDeviceMng FindDriver fail!";
+        sysLogT("LibDeviceMng FindDriver fail!");
         return false;
     }
     ret = pdriver->pshm->shm_readstate(childid, value, len);
