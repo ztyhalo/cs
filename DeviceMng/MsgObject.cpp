@@ -13,6 +13,12 @@ MsgObject::~MsgObject()
 
 bool MsgObject::create_object(void)
 {
+    // 尝试删除消息队列
+    if ((msg_id = msgget(msg_key, 0)) != -1)
+    {
+        msgctl(msg_id, IPC_RMID, NULL);
+    }
+
     msg_id = msgget(msg_key, 0666 | IPC_CREAT);
 
     if (msg_id == -1)
