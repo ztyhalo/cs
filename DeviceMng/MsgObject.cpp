@@ -50,10 +50,10 @@ bool MsgObject::send_object(void* pdata, int size)
     msg_data.msgtype = 1;
     memcpy(msg_data.msgtext, (char*) pdata, size);
 
-    //qDebug() << "------msg send start-----------------------------------------------";
-    //qDebug() << "DeviceMng send_object send msg_id:" << msg_id << " len: " << size;
-    //    qDebug()<<QString::fromStdString(msg_data.msgtext);
-    //qDebug() << "------msg send end------";
+    // qDebug() << "------msg send start-----------------------------------------------";
+    // qDebug() << "DeviceMng send_object send msg_id:" << msg_id << " len: " << size;
+    //     qDebug()<<QString::fromStdString(msg_data.msgtext);
+    // qDebug() << "------msg send end------";
 
     if (msgsnd(msg_id, &msg_data, size, IPC_NOWAIT) == -1)
     {
@@ -71,13 +71,13 @@ bool MsgObject::receive_object(void* pdata, int* psize, int mode)
     len = msgrcv(msg_id, &msg_data, MSG_OBJECT_LENGTH, 1, (mode == RECV_WAIT) ? 0 : IPC_NOWAIT);
     if (len == -1)
     {
-        sysLogQE() << "DeviceMng msgobject receive error:" << strerror(errno);
+        // sysLogQE() << "DeviceMng msgobject receive error:" << strerror(errno);
         return false;
     }
 
     *psize = len;
     memcpy((char*) pdata, msg_data.msgtext, len);
-    //sysLogQD() << "DeviceMng receive_object recv msg_id:" << msg_id << " len: " << len;
+    // sysLogQD() << "DeviceMng receive_object recv msg_id:" << msg_id << " len: " << len;
     return true;
 }
 

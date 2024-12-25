@@ -2,13 +2,29 @@
 #include "MsgMng.h"
 #include <signal.h>
 #include "libdefdebuglog.h"
+
+// #ifdef ARM
+// #include "exception_handler.h"
+// google_breakpad::ExceptionHandler* eh = nullptr;
+
+// static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded)
+// {
+//     Q_UNUSED(context);
+//     qDebug("start breakcommend: %s\n");
+//     QString str = "/opt/bin/breakpad/dump.sh DeviceMng " + QString(descriptor.path());
+//     system(str.toStdString().c_str());
+//     qDebug("stop breakcommend: %s\n", str.toStdString().c_str());
+//     return succeeded;
+// }
+// #endif
+
 static bool sysLogBefore(QString msg, char const* filename, int line)
 {
     Q_UNUSED(msg);
     Q_UNUSED(filename);
     Q_UNUSED(line);
     QFile file("/opt/bin/DeviceMng.Debug");
-    //return file.exists();
+    // return file.exists();
 
     return true;
 }
@@ -19,6 +35,7 @@ void SignalFunc(int var)
     MsgMng*    pMsgMng    = MsgMng::GetMsgMng();
 
     DELETE(pMsgMng);
+    sysLogQE() << "-----------------DELETE(pMsgMng);";
     DELETE(pDeviceMng);
     sysLogQE() << "DeviceMng signal exit finish! main return";
     exit(0);
@@ -30,6 +47,13 @@ int main()
     Liblog::getInstance()->setMinLogLevel(LEVEL_ALL_LOG);
     Liblog::getInstance()->setLogBefore(sysLogBefore);
     setbuf(stdout, NULL);
+
+// #ifdef ARM
+//     system("mkdir -p /opt/236Logs/crashlog");
+//     google_breakpad::MinidumpDescriptor descriptor("/opt/236Logs/crashlog");
+//     eh = new google_breakpad::ExceptionHandler(descriptor, NULL, dumpCallback, NULL, true, -1);
+// #endif
+
     DeviceMng* pDeviceMng = DeviceMng::GetDeviceMng();
     MsgMng*    pMsgMng    = MsgMng::GetMsgMng();
 

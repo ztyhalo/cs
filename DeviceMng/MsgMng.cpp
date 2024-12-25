@@ -11,25 +11,33 @@ MsgMng::~MsgMng()
 {
     mAppTable::iterator item;
 
-    sysLogQD() << "DeviceMng **************~MsgMng";
+    sysLogQD() << "DeviceMng **************~MsgMng begin";
     cancel = true;
+    usleep(30000);
     DELETE(pinitsem);
+    sysLogQD() << "DeviceMng **************DELETE(pinitsem);";
     DELETE(pAppMsg);
+    sysLogQD() << "DeviceMng **************DELETE(pAppMsg)";
     DELETE(pDriverMsg);
+    sysLogQD() << "DeviceMng **************DELETE(pDriverMsg)";
     DELETE(pAppTotalMsg);
+    sysLogQD() << "DeviceMng **************DELETE(pAppTotalMsg)";
     DELETE(pResMsg);
+    sysLogQD() << "DeviceMng **************DELETE(pResMsg)";
+
     pthread_cancel(DriverMsg_id);
     pthread_cancel(AppMsg_id);
 
     for (item = AppTable.begin(); item != AppTable.end(); ++item)
     {
+        sysLogQD() << "DeviceMng **************delete item.value()";
         // item.value()->pmsg->delete_object();
         delete item.value();
         item.value() = (app*) 0;
     }
     AppTable.clear();
     WaitDriverList.clear();
-    sysLogQD() << "DeviceMng **************~MsgMng";
+    sysLogQD() << "DeviceMng **************~MsgMng end";
 }
 
 MsgMng* MsgMng::pMsgCmd = NULL;
@@ -54,6 +62,7 @@ void* DriverMsg_task(void*)
             break;
         }
         pMsgMng->DriverMsgProcess();
+        // sysLogQD() << "--------------------------------DriverMsg_task";
     }
 
     return NULL;
@@ -71,6 +80,7 @@ void* AppMsg_task(void*)
             break;
         }
         pMsgMng->AppMsgProcess();
+        // sysLogQD() << "--------------------------------AppMsg_task";
     }
 
     return NULL;
@@ -182,7 +192,7 @@ void MsgMng::AppMsgProcess(void)
     driver*  pdriver;
     int      key;
 
-    if (!pAppMsg->ReceiveMsg(&pkt, &pkt_len, RECV_WAIT))
+    if (!pAppMsg->ReceiveMsg(&pkt, &pkt_len, RECV_NOWAIT))
     {
         usleep(10000);
         return;
@@ -243,7 +253,7 @@ void MsgMng::AppMsgProcess(void)
                 pkt.data[7]    = (uint8_t) ((GET_DEVMNG_ID & 0x0000ff00) >> 8);
                 pkt.data[8]    = (uint8_t) (GET_DEVMNG_ID & 0x000000ff);
                 pAppTotalMsg->SendMsg(&pkt, NORMAL_MSG_LEN);
-                //qDebug() << "DeviceMng app login sucess!";
+                // qDebug() << "DeviceMng app login sucess!";
                 break;
             }
             else
@@ -260,7 +270,7 @@ void MsgMng::AppMsgProcess(void)
                 pdevice->OperateAppMsgKey(KEY_SUB, papp->pmsg->GetMsgKey());
                 delete papp;
                 DeleteApp(pkt.source.app);
-                //qDebug() << "DeviceMng app logout sucess!";
+                // qDebug() << "DeviceMng app logout sucess!";
             }
             break;
 
@@ -332,7 +342,7 @@ void MsgMng::DriverMsgProcess(void)
     app*     papp;
     driver*  pdriver;
 
-    if (!pDriverMsg->ReceiveMsg(&pkt, &pkt_len, RECV_WAIT))
+    if (!pDriverMsg->ReceiveMsg(&pkt, &pkt_len, RECV_NOWAIT))
     {
         usleep(10000);
         return;
@@ -355,7 +365,7 @@ void MsgMng::DriverMsgProcess(void)
                     pdriver->DriverInfo.TotalOutCnt   = (uint16_t) (((uint16_t) pkt.data[2] << 8) | pkt.data[3]);
                     pdriver->DriverInfo.TotalStateCnt = (uint16_t) (((uint16_t) pkt.data[4] << 8) | pkt.data[5]);
                     // memcpy(&pdriver->DriverInfo,&pkt.data[0],sizeof(sDriverInfoType));
-                    //qDebug() << "$$$DeviceMng MSG_TYPE_DriverGetInfo: " << pdriver->DriverInfo.TotalInCnt
+                    // qDebug() << "$$$DeviceMng MSG_TYPE_DriverGetInfo: " << pdriver->DriverInfo.TotalInCnt
                     //         << pdriver->DriverInfo.TotalOutCnt << pdriver->DriverInfo.TotalStateCnt;
                     AckWaitMsg(pkt.source, pkt.type);
                 }

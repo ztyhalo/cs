@@ -14,10 +14,11 @@ driver::driver(int id, QString& name, int shminkey, int shmoutkey, int shmoutsem
 
 driver::~driver()
 {
-    sysLogQD() << "DeviceMng driver exit start! ";
+    sysLogQD() << "DeviceMng driver exit begin";
     DELETE(pshm);
+    sysLogQD() << "DeviceMng DELETE(pshm)";
     DELETE(pmsg);
-    sysLogQD() << "DeviceMng driver exit finish! ";
+    sysLogQD() << "DeviceMng driver exit end";
 }
 
 bool driver::InitMsg(void)
@@ -39,12 +40,12 @@ bool driver::Init(void)
     }
 
     sysLogQD() << "DeviceMng driver init :shm_create:" << DriverInfo.TotalInCnt + DriverInfo.TotalOutCnt
-             << "    ,shm_state:" << DriverInfo.TotalStateCnt << " !";
+               << "    ,shm_state:" << DriverInfo.TotalStateCnt << " !";
 
     if (!pshm->shm_create(DriverInfo.TotalInCnt + DriverInfo.TotalOutCnt, DriverInfo.TotalStateCnt))
     {
         sysLogQE() << "DeviceMng driver init fail:shm_create:" << DriverInfo.TotalInCnt + DriverInfo.TotalOutCnt
-                 << "    ,shm_state:" << DriverInfo.TotalStateCnt << " !";
+                   << "    ,shm_state:" << DriverInfo.TotalStateCnt << " !";
         return false;
     }
     return true;
