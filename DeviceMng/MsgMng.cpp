@@ -1,5 +1,8 @@
 #include "MsgMng.h"
 #include "libdefdebuglog.h"
+#include <sys/types.h>
+#include <signal.h>
+#include <cerrno>
 MsgMng::MsgMng()
 {
     cancel = false;
@@ -238,8 +241,28 @@ void MsgMng::AppMsgProcess(void)
                     break;
                 }
 
-                app* apphandle = new app(pkt.source.app, key);
+                bool isRecv = (bool) pkt.data[0];
+                sysLogQD() << "isRecv:" << isRecv;
+
+                app* apphandle = new app(pkt.source.app, key, isRecv);
+                // 先清除之前废除的app
+                for (auto iter = AppTable.begin(); iter != AppTable.end();)
+                {
+                    if (!isProcessExists(iter.key()))
+                    {
+                        iter = AppTable.erase(iter);
+                    }
+                    else
+                    {
+                        ++iter;
+                    }
+                }
                 AppTable.insert(pkt.source.app, apphandle);
+
+                for (auto iter : AppTable.keys())
+                {
+                    sysLogQD() << "AppTable key:" << iter;
+                }
 
                 pkt.dest.app   = pkt.source.app;
                 pkt.source.app = BROADCAST_ID;
@@ -253,7 +276,7 @@ void MsgMng::AppMsgProcess(void)
                 pkt.data[7]    = (uint8_t) ((GET_DEVMNG_ID & 0x0000ff00) >> 8);
                 pkt.data[8]    = (uint8_t) (GET_DEVMNG_ID & 0x000000ff);
                 pAppTotalMsg->SendMsg(&pkt, NORMAL_MSG_LEN);
-                // qDebug() << "DeviceMng app login sucess!";
+                sysLogQE() << "DeviceMng app login sucess!";
                 break;
             }
             else
@@ -270,7 +293,7 @@ void MsgMng::AppMsgProcess(void)
                 pdevice->OperateAppMsgKey(KEY_SUB, papp->pmsg->GetMsgKey());
                 delete papp;
                 DeleteApp(pkt.source.app);
-                // qDebug() << "DeviceMng app logout sucess!";
+                sysLogQE() << "DeviceMng app logout sucess!";
             }
             break;
 
@@ -384,6 +407,7 @@ void MsgMng::DriverMsgProcess(void)
     }
     else if (pkt.dest.app == BROADCAST_ID)
     {
+        sysLogQD() << "+++++++++++++++++++++++++++pkt.dest.app == BROADCAST_ID";
         mAppTable::iterator item;
 
         for (item = AppTable.begin(); item != AppTable.end(); ++item)
@@ -394,10 +418,27 @@ void MsgMng::DriverMsgProcess(void)
     }
     else
     {
-        if (FindApp(pkt.dest.app, &papp))
+        sysLogQD() << "+++++++++++++++++++++++++++FindApp(pkt.dest.app, &papp";
+        sysLogQD() << "+++++++++++++++++++++++++++dest.app:" << pkt.dest.app;
+        for (auto iter : AppTable.keys())
         {
-            papp->pmsg->SendMsg(&pkt, pkt_len);
+            sysLogQD() << "+++++++++++++++++++++++++++AppTable key:" << iter;
         }
+
+        mAppTable::iterator item;
+        for (item = AppTable.begin(); item != AppTable.end(); ++item)
+        {
+            if (item.value()->isRecv)
+            {
+                pkt.dest.app = item.key();
+                item.value()->pmsg->SendMsg(&pkt, pkt_len);
+            }
+        }
+
+        //        if (FindApp(pkt.dest.app, &papp))
+        //        {
+        //            papp->pmsg->SendMsg(&pkt, pkt_len);
+        //        }
     }
 
     pthread_mutex_unlock(&RevTaskMutex);
@@ -421,5 +462,17 @@ bool MsgMng::BroadcastToApp(uint16_t type, uint8_t* data, uint16_t len)
         item.value()->pmsg->SendMsg(&pkt, len);
     }
     pthread_mutex_unlock(&RevTaskMutex);
+    return true;
+}
+
+bool MsgMng::isProcessExists(qint64 pid)
+{
+    if (kill(pid, 0) == -1)
+    {
+        if (errno == ESRCH)
+        {
+            return false;
+        }
+    }
     return true;
 }

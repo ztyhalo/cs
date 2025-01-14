@@ -10,7 +10,7 @@
 #include <QTimer>
 
 #define WAIT_MSG_MAX         100
-#define LOGIN_MSG_LEN        0
+#define LOGIN_MSG_LEN        1
 #define LOGIN_ACK_MSG_LEN    9
 #define LOGIN_ACKERR_MSG_LEN 1
 #define MSG_TIMEOUT_VALUE    2000
@@ -61,6 +61,7 @@ class MsgMng : public QObject
     pthread_mutex_t WaitListMutex;
     int             LoginSuccessFlag;
     sem_t           TotalProcessSem;
+    bool            IsRecv;
     static MsgMng*  pMsgCmd;
 
     MsgMng();
@@ -93,6 +94,7 @@ class MsgMng : public QObject
     bool InitRecvMail(void);
     bool InitGetInfo(int driver_id, uint32_t timeout_ms);
     bool MsgSendProcess(Type_MsgAddr& addr, uint16_t msgtype, ackfunctype func, uint8_t* pdata, uint16_t len);
+    void SetIsRecv(bool isRecv);
 };
 
 #endif // MSGMNG_H

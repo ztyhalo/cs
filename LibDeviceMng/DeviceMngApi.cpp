@@ -47,12 +47,15 @@ double __get_us(struct timeval t)
     return (t.tv_sec * 1000000 + t.tv_usec);
 }
 
-int DeviceMngApi::init_data(uint32_t waittime_ms, uint8_t select)
+int DeviceMngApi::init_data(uint32_t waittime_ms, uint8_t select, bool isRecv)
 {
+    sysLogQD() << "LibDeviceMng init_data begin";
     int ret;
 
     pDeviceMng = DeviceMng::GetDeviceMng();
     pMsgMng    = MsgMng::GetMsgMng();
+    pMsgMng->SetIsRecv(isRecv);
+
     struct timeval start, end;
     gettimeofday(&start, NULL);
     ret = pDeviceMng->Init(waittime_ms);
@@ -312,6 +315,8 @@ bool DeviceMngApi::wait_msg(sMsgUnit* recvmsg, uint16_t* msglen, eWaitMsgType mo
     *msglen = (*item).MsgLen;
     pMsgMng->NotifyList.erase(item);
     pthread_mutex_unlock(&pMsgMng->NotifyListMutex);
+
+    sysLogQD() << "------------------------------------NotifyList.erase";
     return true;
 }
 

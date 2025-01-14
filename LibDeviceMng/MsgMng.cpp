@@ -212,7 +212,9 @@ bool MsgMng::LoginRecvMail(uint32_t waittime_ms)
     pkt.dest.app   = DeviceMngId;
     pkt.source.app = GET_APP_ID;
     pkt.type       = MSG_TYPE_AppLogIn;
-    LoginKeyId     = 0;
+    pkt.data[0]    = IsRecv;
+    sysLogQE() << "LibDeviceMng IsRecv:" << IsRecv;
+    LoginKeyId = 0;
 
     pthread_mutex_lock(&WaitListMutex);
     if (!pSendMsg->SendMsg(&pkt, LOGIN_MSG_LEN))
@@ -631,7 +633,13 @@ void MsgMng::RecvMsgProcess(void)
                 NotifyList.append(notifypkt);
                 pthread_mutex_unlock(&NotifyListMutex);
                 sem_post(&NotifySem);
+
+                sysLogQD() << "------------------------------------NotifyList.append";
             }
             break;
     }
+}
+void MsgMng::SetIsRecv(bool isRecv)
+{
+    IsRecv = isRecv;
 }

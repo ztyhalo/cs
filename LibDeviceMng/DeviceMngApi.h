@@ -72,7 +72,7 @@ class DeviceMngApi
 
     ~DeviceMngApi();
 
-    int      init_data(uint32_t waittime_ms, uint8_t select = 0);
+    int      init_data(uint32_t waittime_ms, uint8_t select = 0, bool isRecv = true);
     uint32_t get_point_appid(
         uint8_t DriverId, uint8_t ParentDeviceId, uint8_t ChildDeviceId, uint8_t PointId, uint8_t type = 1);
     double* get_data_point(uint32_t AppId);

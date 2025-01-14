@@ -16,8 +16,8 @@
 #define CFGINI_FILE_PATH "/opt/config/devicemng/devicemng.ini"
 #endif
 
-#define DEVICEMNG_SHARE_KEY_NUM 4   //消息占用4个key
-#define DRIVER_SHARE_KEY_NUM    5   //每个驱动占用5个key
+#define DEVICEMNG_SHARE_KEY_NUM 4 // 消息占用4个key
+#define DRIVER_SHARE_KEY_NUM    5 // 每个驱动占用5个key
 
 typedef enum
 {

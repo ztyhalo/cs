@@ -11,8 +11,9 @@ class app
 
   public:
     msg* pmsg;
+    bool isRecv;
 
-    app(uint32_t id, int msgkey);
+    app(uint32_t id, int msgkey, bool isRecvIn);
     ~app();
     bool Init(void);
 };

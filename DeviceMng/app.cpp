@@ -1,9 +1,10 @@
 #include "app.h"
 #include "libdefdebuglog.h"
 
-app::app(uint32_t id, int msgkey)
+app::app(uint32_t id, int msgkey, bool isRecvIn)
 {
     app_id = id;
+    isRecv = isRecvIn;
     pmsg   = new msg(msgkey);
     Init();
 }

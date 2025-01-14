@@ -10,7 +10,7 @@
 #include <sys/time.h>
 
 #define WAIT_MSG_MAX     100
-#define APP_LOGIN_MAX    10
+#define APP_LOGIN_MAX    11
 #define ABNORMAL_MSG_LEN 1
 #define NORMAL_MSG_LEN   9
 
@@ -20,21 +20,22 @@ typedef struct
     uint16_t     type;
     sem_t*       pack;
 } sWaitMsg;
-typedef QList< sWaitMsg >      lWaitList;
-typedef QMap< uint32_t, app* > mAppTable;
-
+typedef QList< sWaitMsg >         lWaitList;
+typedef QMap< uint32_t, app* >    mAppTable;
+typedef QMap< QString, uint32_t > mAppNameTable;
 class MsgMng
 {
   private:
-    pthread_t  DriverMsg_id;
-    pthread_t  AppMsg_id;
-    msg*       pResMsg;
-    msg*       pDriverMsg;
-    msg*       pAppMsg;
-    msg*       pAppTotalMsg;
-    lWaitList  WaitDriverList;
-    mAppTable  AppTable;
-    SemObject* pinitsem;
+    pthread_t     DriverMsg_id;
+    pthread_t     AppMsg_id;
+    msg*          pResMsg;
+    msg*          pDriverMsg;
+    msg*          pAppMsg;
+    msg*          pAppTotalMsg;
+    lWaitList     WaitDriverList;
+    mAppTable     AppTable;
+    mAppNameTable AppNameTable;
+    SemObject*    pinitsem;
 
     MsgMng();
     bool IsAppMapExist(uint32_t id);
@@ -42,6 +43,7 @@ class MsgMng
     bool DeleteApp(uint32_t id);
     bool CheckWaitMsg(Type_MsgAddr waitid, uint16_t type);
     bool AckWaitMsg(Type_MsgAddr waitid, uint16_t type);
+    bool isProcessExists(qint64 pid);
 
   public:
     pthread_mutex_t RevTaskMutex;
