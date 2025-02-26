@@ -418,12 +418,12 @@ void MsgMng::DriverMsgProcess(void)
     }
     else
     {
-        sysLogQD() << "+++++++++++++++++++++++++++FindApp(pkt.dest.app, &papp";
-        sysLogQD() << "+++++++++++++++++++++++++++dest.app:" << pkt.dest.app;
-        for (auto iter : AppTable.keys())
-        {
-            sysLogQD() << "+++++++++++++++++++++++++++AppTable key:" << iter;
-        }
+        //sysLogQD() << "+++++++++++++++++++++++++++FindApp(pkt.dest.app, &papp";
+        //sysLogQD() << "+++++++++++++++++++++++++++dest.app:" << pkt.dest.app;
+        //for (auto iter : AppTable.keys())
+        //{
+        //    sysLogQD() << "+++++++++++++++++++++++++++AppTable key:" << iter;
+        //}
 
         mAppTable::iterator item;
         for (item = AppTable.begin(); item != AppTable.end(); ++item)

@@ -316,7 +316,7 @@ bool DeviceMngApi::wait_msg(sMsgUnit* recvmsg, uint16_t* msglen, eWaitMsgType mo
     pMsgMng->NotifyList.erase(item);
     pthread_mutex_unlock(&pMsgMng->NotifyListMutex);
 
-    sysLogQD() << "------------------------------------NotifyList.erase";
+    //sysLogQD() << "------------------------------------NotifyList.erase";
     return true;
 }
 

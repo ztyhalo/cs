@@ -634,7 +634,7 @@ void MsgMng::RecvMsgProcess(void)
                 pthread_mutex_unlock(&NotifyListMutex);
                 sem_post(&NotifySem);
 
-                sysLogQD() << "------------------------------------NotifyList.append";
+                //sysLogQD() << "------------------------------------NotifyList.append";
             }
             break;
     }
