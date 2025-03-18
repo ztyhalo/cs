@@ -2,6 +2,7 @@
 #include "MsgMng.h"
 #include <signal.h>
 #include "libdefdebuglog.h"
+#include "libcommon.h"
 
 // #ifdef ARM
 // #include "exception_handler.h"
@@ -48,11 +49,11 @@ int main()
     Liblog::getInstance()->setLogBefore(sysLogBefore);
     setbuf(stdout, NULL);
 
-// #ifdef ARM
-//     system("mkdir -p /opt/236Logs/crashlog");
-//     google_breakpad::MinidumpDescriptor descriptor("/opt/236Logs/crashlog");
-//     eh = new google_breakpad::ExceptionHandler(descriptor, NULL, dumpCallback, NULL, true, -1);
-// #endif
+    // #ifdef ARM
+    //     system("mkdir -p /opt/236Logs/crashlog");
+    //     google_breakpad::MinidumpDescriptor descriptor("/opt/236Logs/crashlog");
+    //     eh = new google_breakpad::ExceptionHandler(descriptor, NULL, dumpCallback, NULL, true, -1);
+    // #endif
 
     DeviceMng* pDeviceMng = DeviceMng::GetDeviceMng();
     MsgMng*    pMsgMng    = MsgMng::GetMsgMng();
@@ -87,10 +88,10 @@ int main()
 
     while (1)
     {
-        sleep(1);
+        SLEEP(1);
         // sysLogQD() << "DeviceMng cycle:" << testcycle++;
         pDeviceMng->SendHeartToDriver();
-        sleep(2);
+        SLEEP(2);
         pDeviceMng->DriverHeartMng();
     }
 

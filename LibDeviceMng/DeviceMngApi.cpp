@@ -1,6 +1,7 @@
 #include "DeviceMngApi.h"
 // #include <QApplication>
 #include "libdefdebuglog.h"
+#include "libcommon.h"
 void SignalFunc(int var)
 {
     Q_UNUSED(var);
@@ -241,7 +242,7 @@ bool DeviceMngApi::ctrl_data_block(uint32_t AppId, double value, uint32_t overti
 
             return ret;
         }
-        usleep(10);
+        USLEEP(10);
         GET_SYS_TIME_MS(ticks);
     }
     sysLogQD() << "LibDeviceMng ctrl_data wait shm_read_used over time!";

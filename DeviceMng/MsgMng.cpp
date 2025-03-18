@@ -1,5 +1,6 @@
 #include "MsgMng.h"
 #include "libdefdebuglog.h"
+#include "libcommon.h"
 #include <sys/types.h>
 #include <signal.h>
 #include <cerrno>
@@ -16,7 +17,7 @@ MsgMng::~MsgMng()
 
     sysLogQD() << "DeviceMng **************~MsgMng begin";
     cancel = true;
-    usleep(30000);
+    USLEEP(30000);
     DELETE(pinitsem);
     sysLogQD() << "DeviceMng **************DELETE(pinitsem);";
     DELETE(pAppMsg);
@@ -197,7 +198,7 @@ void MsgMng::AppMsgProcess(void)
 
     if (!pAppMsg->ReceiveMsg(&pkt, &pkt_len, RECV_NOWAIT))
     {
-        usleep(10000);
+        USLEEP(10000);
         return;
     }
 
@@ -367,7 +368,7 @@ void MsgMng::DriverMsgProcess(void)
 
     if (!pDriverMsg->ReceiveMsg(&pkt, &pkt_len, RECV_NOWAIT))
     {
-        usleep(10000);
+        USLEEP(10000);
         return;
     }
 

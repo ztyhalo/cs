@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "MsgMng.h"
 #include "libdefdebuglog.h"
+#include "libcommon.h"
 driver::driver(int id, QString& name, int shminkey, int shmoutkey, int shmoutsem, int msgkey, int shmstatekey)
 {
     driver_id   = id;
@@ -57,7 +58,7 @@ bool driver::WaitSem(int time_10ms)
 
     for (int i = 0; i < time_10ms; i++)
     {
-        usleep(10000);
+        USLEEP(10000);
         ret = sem_trywait(&AckSem);
         if (ret >= 0)
             return true;

@@ -4,6 +4,7 @@
 #include <time.h>
 #include <errno.h>
 #include "libdefdebuglog.h"
+#include "libcommon.h"
 MsgMng::MsgMng()
 {
     DeviceMngId      = BROADCAST_ID;
@@ -484,13 +485,13 @@ void MsgMng::TotalMsgProcess(void)
 
     if (sem_wait(&TotalProcessSem) == -1)
     {
-        usleep(10000);
+        USLEEP(10000);
         return;
     }
 
     if (!pTotalMsg->ReceiveMsg(&pkt, &pkt_len, RECV_WAIT))
     {
-        usleep(10000);
+        USLEEP(10000);
         return;
     }
 
@@ -543,7 +544,7 @@ void MsgMng::RecvMsgProcess(void)
     if (!pRecvMsg->ReceiveMsg(&pkt, &pkt_len, RECV_WAIT))
     {
         sysLogQE() << "LibDeviceMng Test ReceiveMsg fail!";
-        usleep(10000);
+        USLEEP(10000);
         return;
     }
 
