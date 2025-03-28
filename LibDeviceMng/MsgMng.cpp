@@ -411,15 +411,16 @@ void MsgMng::CheckTimeoutMsg(uint16_t intervaltime)
 
     pthread_mutex_lock(&WaitListMutex);
 
-    for (item = WaitRecvList.begin(); item != WaitRecvList.end(); ++item)
+    for (item = WaitRecvList.begin(); item != WaitRecvList.end();)
     {
         if ((*item).timeout_ms <= intervaltime)
         {
-            WaitRecvList.erase(item);
+            item = WaitRecvList.erase(item);
         }
         else
         {
             (*item).timeout_ms = (*item).timeout_ms - intervaltime;
+            ++item;
         }
     }
     pthread_mutex_unlock(&WaitListMutex);
@@ -635,7 +636,7 @@ void MsgMng::RecvMsgProcess(void)
                 pthread_mutex_unlock(&NotifyListMutex);
                 sem_post(&NotifySem);
 
-                //sysLogQD() << "------------------------------------NotifyList.append";
+                // sysLogQD() << "------------------------------------NotifyList.append";
             }
             break;
     }
