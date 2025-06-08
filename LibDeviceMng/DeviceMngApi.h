@@ -2,7 +2,7 @@
 #define DEVICEMNGAPI_H
 
 #include "DeviceMng.h"
-#include <signal.h>
+
 
 #define PROCESS_MSG_MAX 20
 
@@ -12,11 +12,14 @@ typedef enum
     PARAM_EFFECT_MOMENT
 } eEffectType;
 
-typedef enum
-{
-    WAIT_MSG_BLOCK = 0,
-    WAIT_MSG_UNBLOCK
-} eWaitMsgType;
+
+
+#define GET_SYS_TIME_MS(x)                                                                                             \
+{                                                                                                                  \
+        struct timeval tv;                                                                                             \
+        gettimeofday(&tv, NULL);                                                                                       \
+        x = tv.tv_sec * 1000 + tv.tv_usec / 1000;                                                                      \
+}
 
 enum
 {
@@ -60,15 +63,15 @@ typedef QList< sProcessMsg > lProcessList;
 class DeviceMngApi
 {
   private:
-    DeviceMng* pDeviceMng;
-    MsgMng*    pMsgMng;
-    pthread_t  ProcessMsg_id;
+    DeviceMngApp *     m_pAppDevMng;
+    // MsgMngApp *     m_pMsgMngApp;
+    pthread_t          ProcessMsg_id;
     DeviceMngApi();
     static DeviceMngApi* pCmd;
 
   public:
-    lProcessList         processList;
-    static DeviceMngApi* GetDeviceMngApi(void);
+    lProcessList            processList;
+    static DeviceMngApi*    GetDeviceMngApi(void);
 
     ~DeviceMngApi();
 

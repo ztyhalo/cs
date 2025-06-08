@@ -1,3 +1,7 @@
 [submodule "ptcan"]
 	path = ptcan
 	url = http://172.16.13.152/ktc256v2/ptcan.git
+[submodule "03-ptcan_master"]
+	path = 03-ptcan_master
+	url = http://172.16.13.152/zty/03-ptcan_master.git
+	branch = master

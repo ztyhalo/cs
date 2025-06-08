@@ -6,7 +6,7 @@ QT       += xml
 TARGET = DeviceMng
 TEMPLATE = lib
 
-DEFINES += DEBUGLOG COMMON
+DEFINES += DEBUGLOG COMMON ZCOMMONLIB PTCOMMLIB
 
 TOPDIR = $$PWD/../../public/
 include($$TOPDIR/app.pri)
@@ -18,28 +18,9 @@ DEFINES += DEVICEMNGLIB_LIBRARY
 
 
 SOURCES += \
-    ShmObject.cpp \
-    shm.cpp \
-    SemObject.cpp \
-    MsgObject.cpp \
-    DeviceMng.cpp \
-    driver.cpp \
-    msg.cpp \
-    MsgMng.cpp \
     DeviceMngApi.cpp
 
 HEADERS += \
-    ShmObject.h \
-    shm.h \
-    define.h \
-    SemObject.h \
-    MsgObject.h \
-    DeviceMng.h \
-    driver.h \
-    msgtype.h \
-    msg.h \
-    MsgMng.h \
-    devicemnglib_global.h \
     DeviceMngApi.h
 
 

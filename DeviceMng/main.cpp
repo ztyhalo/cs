@@ -33,9 +33,9 @@ void SignalFunc(int var)
 {
     sysLogQE() "<DeviceMng signal exit:" << var << " >";
     DeviceMng* pDeviceMng = DeviceMng::GetDeviceMng();
-    MsgMng*    pMsgMng    = MsgMng::GetMsgMng();
+    // MsgMng*    pMsgMng    = MsgMng::GetMsgMng();
 
-    DELETE(pMsgMng);
+    // DELETE(pMsgMng);
     sysLogQE() << "-----------------DELETE(pMsgMng);";
     DELETE(pDeviceMng);
     sysLogQE() << "DeviceMng signal exit finish! main return";
@@ -48,15 +48,19 @@ int main()
     Liblog::getInstance()->setMinLogLevel(LEVEL_ALL_LOG);
     Liblog::getInstance()->setLogBefore(sysLogBefore);
     setbuf(stdout, NULL);
+    // string path = "/opt/commonlib";
+    // string pr_file = path + "/deviceMng.log";
+    // PRINTF_CLASS::getInstance()->printf_class_init(path, pr_file);
 
     // #ifdef ARM
     //     system("mkdir -p /opt/236Logs/crashlog");
     //     google_breakpad::MinidumpDescriptor descriptor("/opt/236Logs/crashlog");
     //     eh = new google_breakpad::ExceptionHandler(descriptor, NULL, dumpCallback, NULL, true, -1);
     // #endif
-
+    signal(SIGINT, SignalFunc);
+    signal(SIGTERM, SignalFunc);
     DeviceMng* pDeviceMng = DeviceMng::GetDeviceMng();
-    MsgMng*    pMsgMng    = MsgMng::GetMsgMng();
+    // MsgMng*    pMsgMng    = MsgMng::GetMsgMng();
 
     sysLogI("-----------DeviceMng program start-------------!");
     pDeviceMng->loadCfgFile(CFGXML_FILE_PATH);
@@ -68,24 +72,24 @@ int main()
         return 0;
     }
 
-    if (!pMsgMng->Init(pDeviceMng->GetDeviceMngKey(), pDeviceMng->GetDeviceMngKey() + 1,
+    if (!pDeviceMng->m_pMngServ->init(pDeviceMng->GetDeviceMngKey(), pDeviceMng->GetDeviceMngKey() + 1,
             pDeviceMng->GetDeviceMngKey() + 2, pDeviceMng->GetDeviceMngKey() + 3, pDeviceMng->GetDeviceMngResKey()))
     {
         sysLogQE() << "DeviceMng self msg init fail! main return";
+        DELETE(pDeviceMng);
         return 0;
     }
 
     if (!pDeviceMng->SetupDriver())
     {
         sysLogQE() << "DeviceMng driver init fail! main return";
+        DELETE(pDeviceMng);
         return 0;
     }
-    signal(SIGINT, SignalFunc);
-    signal(SIGTERM, SignalFunc);
 
-    pDeviceMng->InitFinishFlag = true;
+
+    pDeviceMng->m_initOk = true;
     // int testcycle              = 0;
-
     while (1)
     {
         SLEEP(1);
