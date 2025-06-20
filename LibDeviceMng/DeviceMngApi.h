@@ -64,7 +64,7 @@ class DeviceMngApi:public Pth_Class
 {
   private:
     DeviceMngApp *     m_pAppDevMng;
-    pthread_t          ProcessMsg_id;
+    // pthread_t          ProcessMsg_id;
     DeviceMngApi();
     static DeviceMngApi* pCmd;
     class AutoRelease

@@ -108,7 +108,7 @@ void    DeviceMngApi::run()
     return;
 }
 
-DeviceMngApi::DeviceMngApi()
+DeviceMngApi::DeviceMngApi():m_pAppDevMng(NULL)
 {
 
     processList.clear();
