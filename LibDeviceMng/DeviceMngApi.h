@@ -60,14 +60,27 @@ typedef struct
 
 typedef QList< sProcessMsg > lProcessList;
 
-class DeviceMngApi
+class DeviceMngApi:public Pth_Class
 {
   private:
     DeviceMngApp *     m_pAppDevMng;
-    // MsgMngApp *     m_pMsgMngApp;
     pthread_t          ProcessMsg_id;
     DeviceMngApi();
     static DeviceMngApi* pCmd;
+    class AutoRelease
+    {
+      public:
+        ~AutoRelease()
+        {
+            zprintf3("DeviceMngApi auto release!\n");
+            if(pCmd != NULL)
+            {
+                delete pCmd;
+                pCmd = NULL;
+            }
+        }
+    };
+    static AutoRelease g_release;
 
   public:
     lProcessList            processList;
@@ -92,6 +105,8 @@ class DeviceMngApi
     bool    ctrl_data_block(uint32_t AppId, double value, uint32_t overtime_10ms);
     bool    read_ctrl_used(uint32_t AppId, int* value);
     void    bussness_start_imform(void);
+    void    stopWaitMsg(void);
+    void    run();
 };
 
 #endif // DEVICEMNGAPI_H

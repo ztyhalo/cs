@@ -68,17 +68,54 @@ int DeviceMngApi::init_data(uint32_t waittime_ms, uint8_t select, bool isRecv)
     zprintf3("%s!\n", buff);
 
     if (select == 0)
-        pthread_create(&ProcessMsg_id, NULL, ProcessMsg_task, NULL);
+    {
+        // pthread_create(&ProcessMsg_id, NULL, ProcessMsg_task, NULL);
+        this->start("processMsg");
+    }
 
     return ret;
 }
 
+void    DeviceMngApi::run()
+{
+    // DeviceMngApi* pApi = DeviceMngApi::GetDeviceMngApi();
+    sMsgUnit      processmsgdata;
+    uint16_t      processmsglen;
+
+    while (this->running)
+    {
+        memset(&processmsgdata, 0, sizeof(sMsgUnit));
+        processmsglen = 0;
+
+        if (!this->wait_msg(&processmsgdata, &processmsglen, WAIT_MSG_BLOCK))
+        {
+            break;
+        }
+        else
+        {
+            lProcessList::iterator item = this->processList.begin();
+            for (; item != this->processList.end(); ++item)
+            {
+                if (((*item).type == processmsgdata.type) &&
+                    ((*item).driverid == processmsgdata.source.driver.id_driver))
+                {
+                    (*item).callfunc(processmsgdata.data, processmsglen);
+                }
+            }
+        }
+    }
+    zprintf3("LibDeviceMng ProcessMsg_task exit!\n");
+    return;
+}
+
 DeviceMngApi::DeviceMngApi()
 {
+
     processList.clear();
 }
 
 DeviceMngApi* DeviceMngApi::pCmd = NULL;
+DeviceMngApi::AutoRelease DeviceMngApi::g_release;
 DeviceMngApi* DeviceMngApi::GetDeviceMngApi()
 {
     if (pCmd == NULL)
@@ -91,10 +128,23 @@ DeviceMngApi* DeviceMngApi::GetDeviceMngApi()
 DeviceMngApi::~DeviceMngApi()
 {
     zprintf3("LibDeviceMng normal exit start!\n");
-    DELETE(m_pAppDevMng);
-    // DELETE(pDeviceMng);
-    processList.clear();
-    zprintf3("LibDeviceMng normal exit end!\n");
+    if(pCmd != NULL)
+    {
+        if(this->running)
+        {
+            this->running = 0;
+            stopWaitMsg();
+            this->waitEnd();
+        }
+        zprintf3("delete m_pAppDevMng!\n");
+        DELETE(m_pAppDevMng);
+        // DELETE(pDeviceMng);
+        printf("delete m_pAppDevMng end!\n");
+        zprintf3("delete m_pAppDevMng end!\n");
+        processList.clear();
+        zprintf3("LibDeviceMng normal exit end!\n");
+        pCmd = NULL;
+    }
 }
 
 uint32_t DeviceMngApi::get_point_appid(
@@ -292,6 +342,11 @@ bool DeviceMngApi::get_deviceinfo(uint8_t DriverId, backcallfunc func)
 bool DeviceMngApi::wait_msg(sMsgUnit* recvmsg, uint16_t* msglen, eWaitMsgType mode)
 {
     return m_pAppDevMng->m_pMngApp->wait_msg(recvmsg, msglen, mode);
+}
+
+void DeviceMngApi::stopWaitMsg(void)
+{
+    m_pAppDevMng->m_pMngApp->stopWaitSem();
 }
 
 bool DeviceMngApi::read_state(uint8_t DriverId, int childid, char* value, uint16_t len)

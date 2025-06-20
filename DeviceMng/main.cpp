@@ -4,6 +4,8 @@
 #include "libdefdebuglog.h"
 #include "libcommon.h"
 
+static bool g_running = true;
+
 // #ifdef ARM
 // #include "exception_handler.h"
 // google_breakpad::ExceptionHandler* eh = nullptr;
@@ -31,14 +33,16 @@ static bool sysLogBefore(QString msg, char const* filename, int line)
 }
 void SignalFunc(int var)
 {
-    sysLogQE() "<DeviceMng signal exit:" << var << " >";
-    DeviceMng* pDeviceMng = DeviceMng::GetDeviceMng();
+
+    // DeviceMng* pDeviceMng = DeviceMng::GetDeviceMng();
     // MsgMng*    pMsgMng    = MsgMng::GetMsgMng();
 
     // DELETE(pMsgMng);
-    sysLogQE() << "-----------------DELETE(pMsgMng);";
-    DELETE(pDeviceMng);
-    sysLogQE() << "DeviceMng signal exit finish! main return";
+    // DELETE(pDeviceMng);
+    if(g_running == false)
+        return;
+    g_running = false;
+    zprintf1("device mng exit!\n");
     exit(0);
 }
 
@@ -90,7 +94,7 @@ int main()
 
     pDeviceMng->m_initOk = true;
     // int testcycle              = 0;
-    while (1)
+    while (g_running)
     {
         SLEEP(1);
         // sysLogQD() << "DeviceMng cycle:" << testcycle++;
@@ -98,6 +102,6 @@ int main()
         SLEEP(2);
         pDeviceMng->DriverHeartMng();
     }
-
+    zprintf1("device mng main exit!\n");
     return 1;
 }
